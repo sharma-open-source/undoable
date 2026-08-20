@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>undoable — integration harness</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff; --fg: #16181d; --muted: #5c6370; --line: #e2e5ea;
+    --panel: #f6f7f9; --accent: #2f5fe0; --danger: #b4232a; --ok: #17683a;
+    --warn: #8a5a00;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14161a; --fg: #e6e8ec; --muted: #99a1ad; --line: #2b2f36;
+      --panel: #1c1f25; --accent: #7d9dff; --danger: #ff8a8a; --ok: #6fd39b;
+      --warn: #e0b25c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px; background: var(--bg); color: var(--fg);
+    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .wrap { max-width: 1100px; margin: 0 auto; display: grid; gap: 20px; }
+  header h1 { margin: 0 0 4px; font-size: 20px; letter-spacing: -0.01em; }
+  header p { margin: 0; color: var(--muted); font-size: 14px; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 20px; }
+  @media (max-width: 860px) { .cols { grid-template-columns: 1fr; } }
+  .panel {
+    border: 1px solid var(--line); border-radius: 10px; background: var(--panel);
+    padding: 14px;
+  }
+  .panel h2 {
+    margin: 0 0 10px; font-size: 12px; text-transform: uppercase;
+    letter-spacing: 0.07em; color: var(--muted); font-weight: 600;
+  }
+  button {
+    font: inherit; color: inherit; background: var(--bg); cursor: pointer;
+    border: 1px solid var(--line); border-radius: 6px; padding: 5px 10px;
+  }
+  button:hover:not(:disabled) { border-color: var(--accent); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+  button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 2px;
+  }
+  ul#list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  ul#list:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; }
+  li.row {
+    display: flex; align-items: center; gap: 10px; padding: 8px 10px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--bg);
+  }
+  li.row .title { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  li.row .ord { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 13px; min-width: 1.6em; }
+  .toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .toolbar .spacer { flex: 1; }
+  .empty { color: var(--muted); padding: 14px; text-align: center; border: 1px dashed var(--line); border-radius: 8px; }
+  .ctl { display: grid; gap: 10px; }
+  .ctl label { display: grid; grid-template-columns: 150px 1fr auto; gap: 10px; align-items: center; font-size: 14px; }
+  .ctl output { font-variant-numeric: tabular-nums; color: var(--muted); min-width: 5.5em; text-align: right; }
+  .ctl select, .ctl input[type=range] { width: 100%; }
+  #log {
+    font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, monospace;
+    height: 240px; overflow: auto; margin: 0; padding: 0; list-style: none;
+  }
+  #log li { border-bottom: 1px solid var(--line); padding: 3px 0; display: flex; gap: 8px; }
+  #log .t { color: var(--muted); flex: none; }
+  #log .k { flex: none; font-weight: 600; min-width: 8.5em; }
+  .k-pending { color: var(--accent); } .k-committed { color: var(--ok); }
+  .k-reverted { color: var(--warn); } .k-failed { color: var(--danger); }
+  .k-desync { color: var(--danger); font-weight: 700; }
+  table.metrics { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.metrics td { padding: 3px 0; border-bottom: 1px solid var(--line); }
+  table.metrics td:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+  table.metrics tr.bad td { color: var(--danger); font-weight: 600; }
+  #toasts {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    display: grid; gap: 8px; z-index: 10; width: min(420px, calc(100vw - 32px));
+  }
+  .toast {
+    display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+    border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
+    box-shadow: 0 6px 24px rgb(0 0 0 / 0.18);
+  }
+  .toast .msg { flex: 1; min-width: 0; }
+  .toast .bar { height: 2px; background: var(--accent); border-radius: 2px; }
+  .toast.is-error { border-color: var(--danger); }
+  .note { color: var(--muted); font-size: 13px; margin: 8px 0 0; }
+  code { font: 12px ui-monospace, SFMono-Regular, Menlo, monospace; background: var(--bg); padding: 1px 4px; border-radius: 4px; border: 1px solid var(--line); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>undoable — integration harness</h1>
+    <p>Three action shapes, real fault injection. Everything visual here is an event listener; the runtime ships no UI.</p>
+  </header>
+
+  <div class="cols">
+    <div>
+      <div class="panel">
+        <h2>Tasks</h2>
+        <div class="toolbar">
+          <button id="selectAll" type="button">Select all</button>
+          <button id="archiveSelected" type="button" disabled>Archive selected</button>
+          <span class="spacer"></span>
+          <button id="reset" type="button">Reset data</button>
+        </div>
+        <ul id="list"></ul>
+        <p class="note">
+          Archive is markup-driven (<code>data-undoable</code>). Move and bulk go through
+          <code>runAction()</code> because their arguments are structured.
+        </p>
+      </div>
+
+      <div class="panel" style="margin-top:20px">
+        <h2>Fault injection</h2>
+        <div class="ctl">
+          <label>Commit latency
+            <input id="latency" type="range" min="0" max="3000" step="100" value="600">
+            <output id="latencyOut">600 ms</output>
+          </label>
+          <label>Commit failure rate
+            <input id="failure" type="range" min="0" max="100" step="5" value="0">
+            <output id="failureOut">0 %</output>
+          </label>
+          <label>Undo window
+            <input id="window" type="range" min="500" max="8000" step="500" value="5000">
+            <output id="windowOut">5000 ms</output>
+          </label>
+          <label>Render strategy
+            <select id="renderMode">
+              <option value="keyed">keyed (framework-like, reuses nodes)</option>
+              <option value="blowaway">innerHTML (naive, rebuilds all nodes)</option>
+            </select>
+            <output></output>
+          </label>
+          <label>View update timing
+            <select id="renderTiming">
+              <option value="sync">synchronous (inside apply)</option>
+              <option value="async">deferred one frame (React-like)</option>
+            </select>
+            <output></output>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="panel">
+        <h2>Focus probe</h2>
+        <table class="metrics">
+          <tbody>
+            <tr><td>activeElement after last action</td><td id="focusNow">—</td></tr>
+            <tr id="focusLossRow"><td>focus_loss</td><td id="focusLoss">0</td></tr>
+          </tbody>
+        </table>
+        <p class="note">Tab into the list, then archive with the keyboard. Focus must never land on <code>body</code>.</p>
+      </div>
+
+      <div class="panel" style="margin-top:20px">
+        <h2>Metrics</h2>
+        <table class="metrics"><tbody id="metrics"></tbody></table>
+      </div>
+
+      <div class="panel" style="margin-top:20px">
+        <h2>Events</h2>
+        <ul id="log"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toasts" aria-hidden="false"></div>
+
+<script src="../dist/undoable.global.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

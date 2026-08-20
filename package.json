@@ -1,0 +1,51 @@
+{
+  "name": "@sharma/undoable",
+  "version": "0.1.0",
+  "description": "A runtime for optimistic, undoable mutations. One primitive, no UI.",
+  "keywords": [
+    "undo",
+    "optimistic",
+    "optimistic-ui",
+    "accessibility",
+    "focus-management"
+  ],
+  "license": "MIT",
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/undoable.cjs",
+  "module": "./dist/undoable.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/undoable.js",
+      "require": "./dist/undoable.cjs"
+    },
+    "./global": "./dist/undoable.global.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "sideEffects": [
+    "./dist/*"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "example": "npm run build && node examples/serve.js",
+    "probe": "npm run build && node examples/probe.mjs",
+    "probe:browser": "npm run build && node examples/browser-probe.mjs"
+  },
+  "devDependencies": {
+    "jsdom": "^25.0.1",
+    "playwright": "^1.62.1",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

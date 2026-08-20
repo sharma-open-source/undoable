@@ -1,0 +1,10 @@
+# Build output — published to npm, not committed.
+dist/
+
+# Platform-specific: this folder cannot be shared between the devcontainer
+# and the host, since npm only unpacks native binaries for one platform.
+node_modules/
+
+*.tgz
+*.log
+.DS_Store
