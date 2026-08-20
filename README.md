@@ -1,5 +1,11 @@
 # undoable
 
+[![npm](https://img.shields.io/npm/v/@sharma/undoable?color=cb3837&logo=npm)](https://www.npmjs.com/package/@sharma/undoable)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@sharma/undoable?label=gzip)](https://bundlephobia.com/package/@sharma/undoable)
+[![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)](package.json)
+[![types](https://img.shields.io/badge/types-included-3178c6?logo=typescript&logoColor=white)](dist/index.d.ts)
+[![license](https://img.shields.io/github/license/sharma-open-source/undoable?color=blue)](LICENSE)
+
 A runtime that owns the mechanism of optimistic, undoable mutations. Your app
 owns the data and the presentation. One primitive, no UI, no dependencies.
 
