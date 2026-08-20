@@ -15,7 +15,7 @@
     "type": "git",
     "url": "git+https://github.com/sharma-open-source/undoable.git"
   },
-  "homepage": "https://github.com/sharma-open-source/undoable#readme",
+  "homepage": "https://sharma-open-source.github.io/undoable/",
   "bugs": "https://github.com/sharma-open-source/undoable/issues",
   "type": "module",
   "publishConfig": {
