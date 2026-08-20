@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<style>
+  :root {
+    --paper: #0b0e14;
+    --surface: #121722;
+    --ink: #e7eaf3;
+    --muted: #9aa3b8;
+    --rule: #222939;
+    --accent: #8095ff;
+    --pending: #e8a850;
+    --committed: #4ecfa1;
+    --display: ui-monospace, "SF Mono", "JetBrains Mono", "Roboto Mono", Menlo, monospace;
+    --util: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; }
+
+  body {
+    width: 1200px;
+    height: 630px;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--util);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 68px 76px;
+    overflow: hidden;
+  }
+
+  .eyebrow {
+    font-size: 19px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    gap: 14px;
+  }
+
+  .eyebrow .dot { color: var(--rule); }
+
+  h1 {
+    font-family: var(--display);
+    font-size: 92px;
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 0.98;
+  }
+
+  p {
+    font-size: 27px;
+    line-height: 1.42;
+    color: var(--muted);
+    max-width: 810px;
+  }
+
+  p b { color: var(--ink); font-weight: 600; }
+
+  .foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .cmd {
+    font-family: var(--display);
+    font-size: 26px;
+    color: var(--accent);
+  }
+
+  .events { display: flex; gap: 10px; }
+
+  .tag {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 4px;
+  }
+
+  .pending { color: var(--pending); background: #2a2113; }
+  .committed { color: var(--committed); background: #10281f; }
+  .reverted { color: var(--accent); background: #1b2340; }
+</style>
+</head>
+<body>
+  <div class="eyebrow"><span>@sharma/undoable</span><span class="dot">/</span><span>0.1.1</span><span class="dot">/</span><span>MIT</span></div>
+
+  <h1>The undo button<br>is the easy part</h1>
+
+  <p>A <b>4&nbsp;KB runtime</b> for optimistic, undoable mutations — and the five defects that only showed up once a keyboard used it.</p>
+
+  <div class="foot">
+    <span class="cmd">npm i @sharma/undoable</span>
+    <span class="events">
+      <span class="tag pending">pending</span>
+      <span class="tag reverted">reverted</span>
+      <span class="tag committed">committed</span>
+    </span>
+  </div>
+</body>
+</html>
