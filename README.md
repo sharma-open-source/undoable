@@ -1,5 +1,6 @@
 # undoable
 
+[![CI](https://github.com/sharma-open-source/undoable/actions/workflows/ci.yml/badge.svg)](https://github.com/sharma-open-source/undoable/actions/workflows/ci.yml)
 [![npm](https://img.shields.io/npm/v/@sharma/undoable?color=cb3837&logo=npm)](https://www.npmjs.com/package/@sharma/undoable)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@sharma/undoable?label=gzip)](https://bundlephobia.com/package/@sharma/undoable)
 [![dependencies](https://img.shields.io/badge/dependencies-0-brightgreen)](package.json)
