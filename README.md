@@ -16,17 +16,27 @@ See [docs/spec.md](docs/spec.md) for the design contract and
 
 ## Install
 
-No build step required. Drop in the global build and you are done:
-
-```html
-<script src="dist/undoable.global.js"></script>
+```sh
+npm install @sharma/undoable
 ```
-
-Or import it:
 
 ```js
 import { defineAction, runAction, flushPending, configure } from '@sharma/undoable';
 ```
+
+Or skip the build step entirely — one script tag is a complete integration,
+because binding is delegated from `document` and needs no init call:
+
+```html
+<script src="https://cdn.jsdelivr.net/npm/@sharma/undoable@0.1.0/dist/undoable.global.js"></script>
+<script>
+  undoable.defineAction('archiveItem', { /* ... */ });
+</script>
+```
+
+The `/dist/undoable.global.js` path is required — the bare package URL
+resolves to `main`, which is the CommonJS build and throws `module is not
+defined` in a browser.
 
 The package is scoped because the unscoped `undoable` name is held on npm by
 an abandoned 2018 placeholder. The import binding and the `<script>` global
