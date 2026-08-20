@@ -9,8 +9,9 @@
 A runtime that owns the mechanism of optimistic, undoable mutations. Your app
 owns the data and the presentation. One primitive, no UI, no dependencies.
 
-See [docs/spec.md](docs/spec.md) for the design contract and
-[docs/plan.md](docs/plan.md) for how it was built.
+Works with React, Vue, Angular and Svelte — see
+[docs/frameworks.md](docs/frameworks.md). See [docs/spec.md](docs/spec.md) for
+the design contract and [docs/plan.md](docs/plan.md) for how it was built.
 
 ---
 
