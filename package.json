@@ -10,6 +10,13 @@
     "focus-management"
   ],
   "license": "MIT",
+  "author": "Sharma Sathananthan",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sharma-open-source/undoable.git"
+  },
+  "homepage": "https://github.com/sharma-open-source/undoable#readme",
+  "bugs": "https://github.com/sharma-open-source/undoable/issues",
   "type": "module",
   "publishConfig": {
     "access": "public"
