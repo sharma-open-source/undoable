@@ -3,20 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The undo button is the easy part — undoable</title>
-<meta name="description" content="A 4 KB runtime for optimistic, undoable mutations — and the five defects that only showed up once a keyboard used it.">
+<title>The undo button is the easy part — optimistic UI undo in 4 KB</title>
+<meta name="description" content="A 4 KB, dependency-free runtime for optimistic UI with undo. apply() returns its inverse, commit() persists it — plus the window, rollback and focus.">
 <meta name="author" content="Sharma Sathananthan">
 <link rel="canonical" href="https://sharma-open-source.github.io/undoable/">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>↩️</text></svg>">
 <meta property="og:type" content="article">
+<meta property="og:site_name" content="@sharma/undoable">
 <meta property="og:title" content="The undo button is the easy part">
-<meta property="og:description" content="A 4 KB runtime for optimistic, undoable mutations — and the five defects that only showed up once a keyboard used it.">
+<meta property="og:description" content="A 4 KB runtime for optimistic, undoable mutations — and the five defects that only showed up once a keyboard used it. Works with React, Vue, Angular and Svelte.">
 <meta property="og:url" content="https://sharma-open-source.github.io/undoable/">
 <meta property="og:image" content="https://sharma-open-source.github.io/undoable/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The undo button is the easy part — @sharma/undoable 0.1.1">
+<meta property="article:published_time" content="2026-08-20">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The undo button is the easy part">
-<meta name="twitter:description" content="A 4 KB runtime for optimistic, undoable mutations — and the five defects that only showed up once a keyboard used it.">
+<meta name="twitter:description" content="A 4 KB runtime for optimistic, undoable mutations — and the five defects that only showed up once a keyboard used it. Works with React, Vue, Angular and Svelte.">
 <meta name="twitter:image" content="https://sharma-open-source.github.io/undoable/og.png">
+<script type="application/ld+json">[{"@context":"https://schema.org","@type":"TechArticle","headline":"The undo button is the easy part","alternativeHeadline":"The undo button is the easy part — optimistic UI undo in 4 KB","description":"A 4 KB, dependency-free runtime for optimistic UI with undo. apply() returns its inverse, commit() persists it — plus the window, rollback and focus.","inLanguage":"en","datePublished":"2026-08-20","dateModified":"2026-08-20","mainEntityOfPage":{"@type":"WebPage","@id":"https://sharma-open-source.github.io/undoable/"},"image":"https://sharma-open-source.github.io/undoable/og.png","author":{"@type":"Person","name":"Sharma Sathananthan"},"publisher":{"@type":"Person","name":"Sharma Sathananthan"},"about":{"@type":"SoftwareSourceCode","name":"@sharma/undoable","description":"A runtime for optimistic, undoable mutations. One primitive, no UI, no dependencies.","codeRepository":"https://github.com/sharma-open-source/undoable","programmingLanguage":["TypeScript","JavaScript"],"runtimePlatform":["Browser","Node.js"],"license":"https://opensource.org/licenses/MIT","version":"0.1.1","downloadUrl":"https://www.npmjs.com/package/@sharma/undoable","keywords":"optimistic ui, undo, optimistic updates, rollback, accessibility, focus management, aria-live, javascript, typescript"}},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Does it work with React, Vue, Angular or Svelte?","acceptedAnswer":{"@type":"Answer","text":"All four. The runtime knows nothing about your framework — apply() mutates your state and returns the inverse, which is a setState call in React and Angular signals, and a plain mutation in Vue and Svelte 5. The React path is executed end to end in the test suite; the other three are type-correct but not executed."}},{"@type":"Question","name":"How is this different from optimistic updates in TanStack Query or SWR?","acceptedAnswer":{"@type":"Answer","text":"Different layer, and they compose. Those libraries fire the request immediately and roll the cache back if it rejects. undoable owns the window before the request is sent: it holds the commit for five seconds, hands you an undo(), moves focus, and announces the outcome. If you already have a mutation hook, it becomes the body of commit."}},{"@type":"Question","name":"Does it support multi-level undo, or redo?","acceptedAnswer":{"@type":"Answer","text":"No, and it will not. One action is undoable at a time; starting a second one flushes the first into its commit. Redo, an undo stack, and per-action configuration are all declared non-goals."}},{"@type":"Question","name":"Is it accessible out of the box?","acceptedAnswer":{"@type":"Answer","text":"Partly. The runtime manages focus after the DOM changes and announces every outcome through a single aria-live region, with the politeness switched per state. What it does not give you is a reachable undo control — the toast is yours. The announcement strings are also English-only."}},{"@type":"Question","name":"How big is it, and what does it depend on?","acceptedAnswer":{"@type":"Answer","text":"The ESM build is about 13 KB unminified and just over 4 KB gzipped, with zero runtime dependencies. TypeScript types ship with it. Node 20 or newer for the tooling; any modern browser at runtime."}},{"@type":"Question","name":"Do I need a build step or a bundler?","acceptedAnswer":{"@type":"Answer","text":"No. One script tag is a complete integration, because binding is delegated from document and there is no init call. Use the /dist/undoable.global.js path — the bare package URL resolves to the CommonJS build and throws \"module is not defined\" in a browser."}},{"@type":"Question","name":"Is it safe to import in a server-rendered app?","acceptedAnswer":{"@type":"Answer","text":"Yes. Next.js, Nuxt, SvelteKit and Angular Universal are all fine. The module binds on import, but the binding is guarded on typeof document and no-ops on the server."}}]}]</script>
 <style>
   /* The artifact host ships a reset; standing on our own here. */
   body { margin: 0; }
@@ -596,6 +602,17 @@
   .defect h3 { margin: 0; max-width: none; }
   .defect p { max-width: none; font-size: 0.98rem; }
 
+  .faq {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--rule);
+  }
+
+  .faq h3 { margin: 0; }
+  .faq pre { font-size: 0.72rem; }
+
   .stats {
     margin: 0.4rem 0;
     display: grid;
@@ -826,6 +843,47 @@ defineAction(<span class="st">'archiveItem'</span>, {
       <p>SPA route changes are invisible to the runtime. Call <code>flushPending()</code> in your router hook, or a pending change is silently dropped when the view unmounts:</p>
 <pre><code>router.beforeEach(() =&gt; undoable.flushPending());</code></pre>
       <p><code>pagehide</code> and tab-hide are already handled.</p>
+    </section>
+
+    <section>
+      <h2>Common questions</h2>
+
+      <div class="faq">
+        <h3>Does it work with React, Vue, Angular or Svelte?</h3>
+        <p>All four. The runtime knows nothing about your framework — <code>apply</code> mutates your state and returns the inverse, which is a <code>setState</code> call in React and Angular signals, and a plain mutation in Vue and Svelte&nbsp;5. The React path is executed end to end in the test suite; the other three are type-correct but not executed. <a href="https://github.com/sharma-open-source/undoable/blob/main/docs/frameworks.md">Framework guide</a>.</p>
+      </div>
+
+      <div class="faq">
+        <h3>How is this different from optimistic updates in TanStack Query or SWR?</h3>
+        <p>Different layer, and they compose. Those libraries fire the request immediately and roll the cache back if it rejects. <code>undoable</code> owns the window <em>before</em> the request is sent: it holds the commit for five seconds, hands you an <code>undo()</code>, moves focus, and announces the outcome. If you already have a mutation hook, it becomes the body of <code>commit</code>.</p>
+      </div>
+
+      <div class="faq">
+        <h3>Does it support multi-level undo, or redo?</h3>
+        <p>No, and it will not. One action is undoable at a time; starting a second one flushes the first into its commit. Redo, an undo stack, and per-action configuration are all declared non-goals — a stack is a different primitive with different failure modes, and bolting it on here would compromise both.</p>
+      </div>
+
+      <div class="faq">
+        <h3>Is it accessible out of the box?</h3>
+        <p>Partly, and it is worth being precise about which part. The runtime manages focus after the DOM changes and announces every outcome through a single <code>aria-live</code> region, with the politeness switched per state. What it does not give you is a reachable undo control — the toast is yours, and getting a keyboard user to it inside the window is your problem. The announcement strings are also English-only.</p>
+      </div>
+
+      <div class="faq">
+        <h3>How big is it, and what does it depend on?</h3>
+        <p>The ESM build is about 13&nbsp;KB unminified and just over 4&nbsp;KB gzipped, with <strong>zero runtime dependencies</strong>. TypeScript types ship with it. Node&nbsp;≥&nbsp;20 for the tooling; any modern browser at runtime.</p>
+      </div>
+
+      <div class="faq">
+        <h3>Do I need a build step or a bundler?</h3>
+        <p>No. One script tag is a complete integration, because binding is delegated from <code>document</code> and there is no init call:</p>
+<pre><code>&lt;<span class="kw">script</span> src=<span class="st">"https://cdn.jsdelivr.net/npm/@sharma/undoable@0.1.1/dist/undoable.global.js"</span>&gt;&lt;/<span class="kw">script</span>&gt;</code></pre>
+        <p>The <code>/dist/undoable.global.js</code> path matters — the bare package URL resolves to the CommonJS build and throws <code>module is not defined</code> in a browser.</p>
+      </div>
+
+      <div class="faq">
+        <h3>Is it safe to import in a server-rendered app?</h3>
+        <p>Yes. Next.js, Nuxt, SvelteKit and Angular Universal are all fine. The module binds on import, but the binding is guarded on <code>typeof document</code> and no-ops on the server. <code>defineAction</code> and <code>configure</code> work server-side; <code>runAction</code> belongs in the browser.</p>
+      </div>
     </section>
 
     <section>
