@@ -10,6 +10,11 @@
 A runtime that owns the mechanism of optimistic, undoable mutations. Your app
 owns the data and the presentation. One primitive, no UI, no dependencies.
 
+**[Try it in the browser →](https://sharma-open-source.github.io/undoable/)**
+The page runs this build, so the archive, the undo window and the rollback in
+it are real. It doubles as the write-up: why the primitive is shaped this way,
+and the five defects that only appeared once a keyboard used it.
+
 Works with React, Vue, Angular and Svelte — see
 [docs/frameworks.md](docs/frameworks.md). See [docs/spec.md](docs/spec.md) for
 the design contract and [docs/plan.md](docs/plan.md) for how it was built.
