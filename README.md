@@ -29,7 +29,7 @@ Or skip the build step entirely — one script tag is a complete integration,
 because binding is delegated from `document` and needs no init call:
 
 ```html
-<script src="https://cdn.jsdelivr.net/npm/@sharma/undoable@0.1.0/dist/undoable.global.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@sharma/undoable@0.1.1/dist/undoable.global.js"></script>
 <script>
   undoable.defineAction('archiveItem', { /* ... */ });
 </script>

@@ -45,6 +45,7 @@
   ],
   "scripts": {
     "build": "tsup",
+    "prepublishOnly": "npm run build && npm test",
     "dev": "tsup --watch",
     "test": "vitest run",
     "test:watch": "vitest",
