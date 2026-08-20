@@ -6,8 +6,14 @@
     "undo",
     "optimistic",
     "optimistic-ui",
+    "optimistic-updates",
+    "rollback",
     "accessibility",
-    "focus-management"
+    "a11y",
+    "focus-management",
+    "aria-live",
+    "framework-agnostic",
+    "zero-dependencies"
   ],
   "license": "MIT",
   "author": "Sharma Sathananthan",
